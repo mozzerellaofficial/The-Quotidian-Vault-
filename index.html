@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Quotidian Vault - Official Site</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>    :root {
+      --bg-color: #030303; 
+      --bg-alt: #0a0a0a;
+      --text-main: #e0e0e0;
+      --text-dim: #888888;
+      --text-sub: #555555;
+      
+      --glass-bg: rgba(10, 10, 10, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      
+      --card-bg: rgba(25, 25, 25, 0.4);
+      --card-border: rgba(255, 255, 255, 0.05);
+      --card-hover-border: rgba(255, 255, 255, 0.2);
+      
+      --accent-color: #ffffff;
+      --danger-color: #ef4444;
+      --primary-btn: #ffffff;
+      --primary-btn-text: #000000;
+    }
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: transparent; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden; 
+    }
+
+    /* ── Background Canvas ── */
+    .binary-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── Smooth Scroll Container ── */
+    .scroll-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+      z-index: 10;
+    }
+
+    .scroll-container::-webkit-scrollbar { display: none; }
+    .scroll-container { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ── Sections ── */
+    .section {
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      scroll-snap-align: start;
+    }
+
+    .snap-page {
+      scroll-snap-align: start;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    .splash-section {
+      background: transparent; 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .splash-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .splash-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 0;
+      text-shadow: 0 4px 24px rgba(0,0,0,0.2);
+      color: var(--text-main);
+    }
+
+    .splash-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    .content-wrapper {
+      background-color: transparent; 
+      z-index: 20;
+      position: relative;
+    }
+
+    /* ── Navigation Bar ── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 70px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 56px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--glass-border);
+      z-index: 100;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-item {
+      color: var(--text-sub);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s ease;
+      padding: 8px 0;
+      background: none;
+      border: none;
+    }
+
+    .nav-item:hover { color: var(--text-main); }
+    .nav-item.active { color: var(--accent-color); }
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 2px;
+      background-color: var(--accent-color);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    /* ── Page Layouts ── */
+    .page-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+      justify-content: center;
+      position: relative;
+    }
+
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      width: 100%;
+      will-change: transform, opacity, filter;
+    }
+
+    .huge-title {
+      font-size: 4rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 24px;
+      line-height: 1.1;
+      color: var(--text-main);
+    }
+
+    .huge-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      font-weight: 400;
+      margin: 0;
+    }
+
+    .visual-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .geometric-vault {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      color: var(--accent-color);
+      animation: float-rotate 12s ease-in-out infinite;
+      filter: drop-shadow(0 10px 30px rgba(0,0,0,0.05));
+    }
+
+    @keyframes float-rotate {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(2deg); }
+    }
+
+    /* ── Cinematic Text Blocks ── */
+    .security-impact-layout {
+      position: absolute;
+      right: 5%;
+      width: 45%; 
+      max-width: 600px;
+      min-width: 400px; 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      top: 50%;
+      transform: translateY(-50%) translateX(100px);
+      opacity: 0;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+
+    .security-title {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      line-height: 1.1;
+      color: var(--text-main); 
+    }
+
+    .security-desc {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* ── Sticky Container Fix ── */
+    .sticky-timeline {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Feature Layout ── */
+    .feature-presentation-box {
+      position: absolute;
+      will-change: transform, opacity, filter;
+    }
+    
+    .feature-huge-icon {
+      width: 72px;
+      height: 72px;
+      color: var(--text-main);
+      margin-bottom: 24px;
+    }
+
+    /* ── Standard Elements ── */
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 60px;
+      text-align: center;
+      color: var(--text-main);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      width: 100%;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 32px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); border-color: var(--card-hover-border); }
+    .feature-icon { width: 32px; height: 32px; margin-bottom: 20px; color: var(--text-main); }
+    .feature-icon.danger { color: var(--danger-color); }
+    .feature-title { font-size: 1.2rem; font-weight: 700; margin: 0 0 12px 0; color: var(--text-main); }
+    
+    .download-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 64px 40px;
+      text-align: center;
+      width: 100%;
+      max-width: 600px;
+    }
+    .btn-primary {
+      background: var(--primary-btn);
+      color: var(--primary-btn-text);
+      border: 1px solid rgba(150,150,150,0.2);
+      border-radius: 8px;
+      padding: 16px 32px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+    .disclaimer { font-size: 0.8rem; color: var(--text-sub); line-height: 1.5; }
+
+    .timeline { width: 100%; max-width: 700px; border-left: 2px solid var(--card-border); padding-left: 32px; margin-left: 16px; }
+    .timeline-item { position: relative; margin-bottom: 48px; }
+    .timeline-dot { position: absolute; left: -41px; top: 4px; width: 16px; height: 16px; background: var(--bg-alt); border: 2px solid var(--text-main); border-radius: 50%; }
+    .timeline-date { font-size: 0.8rem; color: var(--text-dim); font-weight: 600; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .timeline-content h3 { margin: 0 0 12px 0; font-size: 1.2rem; color: var(--text-main); }
+    .timeline-content p { margin: 0; color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
+    
+    .svg-icon { stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+
+    @media (max-width: 768px) {
+      .split-layout { grid-template-columns: 1fr; text-align: center; }
+      .huge-title { font-size: 2.5rem; }
+      .geometric-vault { max-width: 250px; }
+      .security-impact-layout { right: 0; left: 0; width: 90%; margin: 0 auto; min-width: unset; text-align: center; }
+    }
+
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">    const { useEffect, useRef, useState } = React;
+
+    const lerp = (start, end, amt) => start + (end - start) * amt;
+    const lerpColor = (start, end, amt) => Math.round(start + (end - start) * amt);
+
+    const GridIcon = () => (
+      <svg className="svg-icon" viewBox="0 0 100 120" style={{width: '64px', height: '74px', color: 'var(--text-main)'}}>
+        <path d="M 30 50 V 30 L 50 15 L 70 30 V 50" strokeWidth="12" strokeLinejoin="round" />
+        <path d="M 50 40 L 85 60 V 95 L 50 115 L 15 95 V 60 Z" strokeWidth="12" strokeLinejoin="round" />
+        <path d="M 65 95 L 95 120" strokeWidth="12" strokeLinecap="square" />
+      </svg>
+    );
+
+    const ArrowDownIcon = () => <svg className="svg-icon" viewBox="0 0 24 24" style={{width: '20px', height: '20px'}}><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>;
+    const ShieldIcon = () => <svg className="svg-icon feature-huge-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>;
+    const GhostIcon = () => <svg className="svg-icon feature-huge-icon" viewBox="0 0 24 24"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"></path></svg>;
+    const FolderIcon = () => <svg className="svg-icon feature-huge-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>;
+    const AlertIcon = () => <svg className="svg-icon feature-icon danger" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>;
+    const SearchIcon = () => <svg className="svg-icon feature-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>;
+    const DownloadIcon = () => <svg className="svg-icon" viewBox="0 0 24 24" style={{width: '20px', height: '20px'}}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>;
+
+    const AbstractVaultVisual = () => (
+      <svg className="geometric-vault" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 100 15 L 180 60 L 180 140 L 100 185 L 20 140 L 20 60 Z" fill="none" stroke="currentColor" strokeWidth="6" strokeLinejoin="round" />
+        <path d="M 100 15 L 100 100 M 20 60 L 100 100 M 180 60 L 100 100" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+        <path d="M 100 100 L 100 185" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity="0.3" />
+        <path d="M 20 140 L 100 100 M 180 140 L 100 100" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity="0.3" />
+        <circle cx="100" cy="100" r="14" fill="currentColor" />
+        <circle cx="100" cy="100" r="28" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="6 6" />
+      </svg>
+    );
+
+
+
+    function OfficialSite() {
+      const canvasRef = useRef(null);
+      const scrollRef = useRef(null);
+      
+      const scrollState = useRef({ target: 0, current: 0 });
+      
+      const heroDOMRef = useRef(null);
+      const securityTextRef = useRef(null);
+      const feature1Ref = useRef(null);
+      const feature2Ref = useRef(null);
+      const featureImageRef = useRef(null);
+      const explorerTextRef = useRef(null);
+      const downloadTextRef = useRef(null);
+      const downloadBoxRef = useRef(null);
+
+      const [activeTab, setActiveTab] = useState('home');
+      const [showTerms, setShowTerms] = useState(false);
+      const [showTutorial, setShowTutorial] = useState(false);
+      const [showDownloadModal, setShowDownloadModal] = useState(false);
+
+      const homeRef = useRef(null);
+      const featuresRef = useRef(null);
+      const additionalRef = useRef(null);
+      const downloadRef = useRef(null);
+      const updatesRef = useRef(null);
+
+      // --- Core Canvas & Physics Engine ---
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let particles = [];
+        
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        let mouse = { x: -1000, y: -1000 };
+        let lastMouse = { x: -1000, y: -1000 };
+        
+        const handleMouseMove = (e) => { mouse.x = e.clientX; mouse.y = e.clientY; };
+        const handleMouseLeave = () => { mouse.x = -1000; mouse.y = -1000; lastMouse.x = -1000; lastMouse.y = -1000; };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseleave', handleMouseLeave);
+        window.addEventListener('resize', () => {
+          width = window.innerWidth;
+          height = window.innerHeight;
+          canvas.width = width;
+          canvas.height = height;
+        });
+
+        const fontSize = 16;
+        const columns = Math.floor(width / fontSize) + 2; 
+        const rows = Math.floor(height / fontSize) + 2;
+        
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < columns; x++) {
+            particles.push({
+              index: particles.length,
+              baseX: x * fontSize,
+              baseY: y * fontSize,
+              x: x * fontSize,
+              y: y * fontSize,
+              vx: 0,
+              vy: 0,
+              char: Math.random() > 0.5 ? '1' : '0',
+              h1: Math.abs(Math.sin(particles.length * 12.9898) * 43758.5453) % 1,
+              h2: Math.abs(Math.cos(particles.length * 78.233) * 43758.5453) % 1
+            });
+          }
+        }
+
+        let time = 0;
+        const REPULSION_RADIUS = 150; 
+        const GOLDEN_ANGLE = 137.5 * (Math.PI / 180);
+
+        const render = () => {
+          time += 0.02;
+
+          // Interpolate scroll smoothly
+          scrollState.current.current = lerp(scrollState.current.current, scrollState.current.target, 0.06);
+          const S_norm = scrollState.current.current; 
+          
+          // --- EXTENDED TIMELINE MATH ---
+          // C represents cinematic padlock progress (S_norm: 1 to 4)
+          const C = Math.max(0, S_norm - 1); 
+          // F represents features slide progress (S_norm: 4 to 7)
+          const F = Math.max(0, S_norm - 4); 
+          // W represents the light-wave transition (S_norm: 7 to 9)
+          const W = Math.max(0, S_norm - 6.8); 
+
+          // --- DOM Synchronization: Cinematic Slide ---
+          const vacuumProgress = Math.min(1, Math.max(0, (C - 0.1) / 0.4)); 
+          const textInProgress = Math.min(1, Math.max(0, (C - 0.8) / 0.3));
+          const textOutProgress = Math.min(1, Math.max(0, (C - 1.7) / 0.2));
+
+          if (heroDOMRef.current) {
+            heroDOMRef.current.style.opacity = 1 - vacuumProgress;
+            heroDOMRef.current.style.filter = `blur(${vacuumProgress * 15}px) grayscale(100%)`;
+            heroDOMRef.current.style.transform = `scale(${1 - (vacuumProgress * 0.1)})`;
+            heroDOMRef.current.style.pointerEvents = vacuumProgress > 0.5 ? 'none' : 'auto';
+          }
+
+          if (securityTextRef.current) {
+            const easeOutBack = 1 + 2.70158 * Math.pow(textInProgress - 1, 3) + 1.70158 * Math.pow(textInProgress - 1, 2);
+            const xOffset = textInProgress < 1 ? (100 - (100 * easeOutBack)) : 0;
+            
+            securityTextRef.current.style.opacity = textInProgress * (1 - textOutProgress);
+            securityTextRef.current.style.transform = `translateY(-50%) translateX(${xOffset}px)`;
+          }
+
+          // --- DOM Synchronization: Features Slides ---
+          if (feature1Ref.current) {
+              const f1Out = Math.min(1, Math.max(0, (F - 0.5) / 0.7));
+              feature1Ref.current.style.opacity = 1 - f1Out;
+              feature1Ref.current.style.transform = `translateY(${-(f1Out * 120)}px)`;
+              feature1Ref.current.style.filter = `blur(${f1Out * 12}px)`;
+              feature1Ref.current.style.pointerEvents = f1Out > 0.5 ? 'none' : 'auto';
+              
+              if (featureImageRef.current) {
+                  featureImageRef.current.style.opacity = 1 - f1Out;
+                  featureImageRef.current.style.transform = `translateY(${-(f1Out * 60)}px)`;
+              }
+          }
+
+          if (feature2Ref.current) {
+              const f2In = Math.min(1, Math.max(0, (F - 1.0) / 0.7));
+              const f2Out = Math.min(1, Math.max(0, (F - 2.5) / 0.5)); // Fades out before wave hits
+              feature2Ref.current.style.opacity = f2In * (1 - f2Out);
+              feature2Ref.current.style.transform = `translateY(${(1 - f2In) * 120 - (f2Out * 120)}px)`;
+              feature2Ref.current.style.filter = `blur(${(1 - f2In) * 12 + (f2Out * 12)}px)`;
+          }
+
+          if (explorerTextRef.current) {
+              const eIn = Math.min(1, Math.max(0, (W - 0.2) / 0.5));
+              const eOut = Math.min(1, Math.max(0, (W - 1.2) / 0.5));
+              explorerTextRef.current.style.opacity = eIn * (1 - eOut);
+              explorerTextRef.current.style.transform = `scale(${0.9 + (eIn * 0.1)}) translateY(${-(eOut * 50)}px)`;
+              explorerTextRef.current.style.filter = `blur(${(1 - eIn) * 10}px)`;
+          }
+
+          // --- CSS Theme Light/Dark Mode Math ---
+          // Light mode dynamically inverts variables as the wave travels
+          // --- DOM Sync: Download Typewriter & Box ---
+          if (downloadTextRef.current) {
+              const dProg = Math.min(1, Math.max(0, (S_norm - 10.2) / 0.4));
+              const dText = "Secure. Portable. Yours.";
+              const chars = Math.floor(dProg * dText.length);
+              downloadTextRef.current.innerText = dText.substring(0, chars);
+              
+              let boxInFade = Math.min(1, Math.max(0, (S_norm - 10.5) / 0.5));
+              downloadTextRef.current.style.opacity = 1 - boxInFade;
+              downloadTextRef.current.style.transform = `translateY(${-(boxInFade * 50)}px)`;
+          }
+
+          let boxIn = 0;
+          if (downloadBoxRef.current) {
+              boxIn = Math.min(1, Math.max(0, (S_norm - 10.5) / 0.5));
+              downloadBoxRef.current.style.opacity = boxIn;
+              downloadBoxRef.current.style.transform = `translateY(calc(-50% + ${50 - boxIn * 50}px))`;
+              downloadBoxRef.current.style.pointerEvents = boxIn > 0.8 ? 'auto' : 'none';
+          }
+
+          // Light mode dynamically inverts variables
+          let lightMode = 0;
+          if (S_norm >= 0.5 && S_norm < 1.0) {
+              lightMode = (S_norm - 0.5) / 0.5;
+          } else if (S_norm >= 1.0 && S_norm < 1.5) {
+              lightMode = 1.0;
+          } else if (S_norm >= 1.5 && S_norm < 2.0) {
+              lightMode = 1.0 - ((S_norm - 1.5) / 0.5);
+          } else if (S_norm >= 6.5 && S_norm < 7.0) {
+              lightMode = Math.min(1, Math.max(0, (S_norm - 6.5) / 0.5));
+          } else if (S_norm >= 7.0 && S_norm < 8.5) {
+              lightMode = 1.0;
+          } else if (S_norm >= 8.5 && S_norm < 9.0) {
+              lightMode = 1.0 - ((S_norm - 8.5) / 0.5);
+          } else {
+              lightMode = 0;
+          }
+          
+          const textMain = lerpColor(224, 20, lightMode);
+          document.documentElement.style.setProperty('--text-main', `rgb(${textMain}, ${textMain}, ${textMain})`);
+          
+          const textDim = lerpColor(136, 100, lightMode);
+          document.documentElement.style.setProperty('--text-dim', `rgb(${textDim}, ${textDim}, ${textDim})`);
+          
+          const glassRGB = lerpColor(10, 252, lightMode);
+          document.documentElement.style.setProperty('--glass-bg', `rgba(${glassRGB}, ${glassRGB}, ${glassRGB}, 0.7)`);
+          
+          const borderRGB = lerpColor(255, 0, lightMode);
+          document.documentElement.style.setProperty('--card-border', `rgba(${borderRGB}, ${borderRGB}, ${borderRGB}, ${0.05 + (lightMode*0.1)})`);
+          
+          const cardBgRGB = lerpColor(25, 255, lightMode);
+          document.documentElement.style.setProperty('--card-bg', `rgba(${cardBgRGB}, ${cardBgRGB}, ${cardBgRGB}, 0.4)`);
+
+          const accent = lerpColor(255, 0, lightMode);
+          document.documentElement.style.setProperty('--accent-color', `rgb(${accent}, ${accent}, ${accent})`);
+          
+          const btnText = lerpColor(0, 255, lightMode);
+          document.documentElement.style.setProperty('--primary-btn-text', `rgb(${btnText}, ${btnText}, ${btnText})`);
+
+          document.documentElement.style.setProperty('--logo-invert', 1 - lightMode);
+
+          // Background fill 
+          const bgVal = lerpColor(3, 250, lightMode); 
+          ctx.fillStyle = `rgb(${bgVal}, ${bgVal}, ${bgVal})`;
+          ctx.fillRect(0, 0, width, height);
+
+          // Wave Physics Variables
+          const waveProgress = Math.min(1, Math.max(0, W / 1.0)); 
+          const maxWaveRadius = Math.sqrt(width * width + height * height);
+          const currentWaveRadius = waveProgress * maxWaveRadius * 1.5;
+
+          // Base Particle Coloring
+          let baseParticleRgb = 120;
+          if (S_norm < 0.5) baseParticleRgb = 120 + (135 * (S_norm/0.5)); 
+          else if (S_norm >= 0.5 && S_norm <= 1.0) baseParticleRgb = 255 - (255 * ((S_norm-0.5)/0.5));
+          if (C > 0 && C < 1.0) baseParticleRgb = 0 + (150 * C); 
+          else if (C >= 1.0) baseParticleRgb = 150; 
+          
+          // Switch particle base for light mode
+          baseParticleRgb = lerpColor(baseParticleRgb, 80, lightMode);
+
+          const activeColor = `rgb(${baseParticleRgb}, ${baseParticleRgb}, ${baseParticleRgb})`;
+          const idleColor = `rgba(${Math.max(0, baseParticleRgb - 40)}, ${Math.max(0, baseParticleRgb - 40)}, ${Math.max(0, baseParticleRgb - 40)}, 1)`;
+
+          // --- Physics Engine Execution ---
+          let lockCenterY = height / 2;
+          let lockCenterX = width / 2;
+          if (width > 768) lockCenterX -= textInProgress * (width * 0.25); 
+
+          let mouseVx = 0; let mouseVy = 0;
+          if (lastMouse.x > -100 && mouse.x > -100) { mouseVx = mouse.x - lastMouse.x; mouseVy = mouse.y - lastMouse.y; }
+          lastMouse.x = mouse.x; lastMouse.y = mouse.y;
+
+          ctx.font = `${fontSize}px monospace`;
+          
+          const spiralProgress = Math.min(1, Math.max(0, (C - 0.3) / 0.5));
+          const lockProgress = Math.min(1, Math.max(0, (C - 0.6) / 0.5));
+          const blowupProgress = Math.min(1, Math.max(0, (C - 1.8) / 0.3));
+          const regridProgress = Math.min(1, Math.max(0, (C - 2.0) / 0.4));
+          const dlAnimProgress = Math.min(1, Math.max(0, (S_norm - 9.8) / 0.8)); // 9.8 to 10.6
+
+          const sequenceActive = (C > 0 && regridProgress < 1) || dlAnimProgress > 0;
+          const currentSpring = 0.03 + (0.07 * (sequenceActive ? 1 : 0)); 
+          const currentFriction = 0.92 - (0.15 * (sequenceActive ? 1 : 0));
+
+          particles.forEach((p) => {
+            let targetX = p.baseX;
+            let targetY = p.baseY;
+            let overrideAlpha = null;
+            let overrideFill = null;
+
+            // Phase A: The Padlock Sequence
+            if (sequenceActive) {
+              if (vacuumProgress > 0 && spiralProgress === 0) {
+                 const nx = 1 - (p.baseX / width); 
+                 let pProgress = vacuumProgress * 1.5 - (nx * 0.5); 
+                 pProgress = Math.min(1, Math.max(0, pProgress));
+                 const easeInCubic = Math.pow(pProgress, 3);
+                 targetX += easeInCubic * (width + 800); 
+              }
+
+              if (spiralProgress > 0) {
+                const theta = p.index * GOLDEN_ANGLE + (time * (3 + spiralProgress * 10)); 
+                const spiralRadius = Math.sqrt(p.index) * 12;
+                const spiralOriginX = (width + 600) - (spiralProgress * (width/2 + 600 - lockCenterX));
+                
+                const spiralX = spiralOriginX + Math.cos(theta) * spiralRadius;
+                const spiralY = lockCenterY + Math.sin(theta) * spiralRadius;
+
+                let pX = lockCenterX;
+                let pY = lockCenterY;
+                const lockWidth = 120; 
+                const lockHeight = 90; 
+                
+                if (p.h1 < 0.6) { 
+                    pX += (p.h2 - 0.5) * lockWidth;
+                    pY += ((p.h1 / 0.6) - 0.5) * lockHeight + lockHeight/2;
+                    const distToKeyhole = Math.sqrt(Math.pow(pX - lockCenterX, 2) + Math.pow(pY - (lockCenterY + lockHeight/2), 2));
+                    if (distToKeyhole < 18) pY += 30; 
+                } else { 
+                    const arcTheta = Math.PI + (p.h2 * Math.PI); 
+                    const arcR = 35 + ((p.h1 - 0.6) / 0.4) * 15; 
+                    pX += Math.cos(arcTheta) * arcR;
+                    pY += Math.sin(arcTheta) * arcR;
+                }
+
+                if (lockProgress === 0) {
+                   targetX = lerp(targetX, spiralX, spiralProgress);
+                   targetY = lerp(targetY, spiralY, spiralProgress);
+                } else {
+                   if (p.index < 1200) { 
+                      targetX = lerp(spiralX, pX, lockProgress);
+                      targetY = lerp(spiralY, pY, lockProgress);
+                      overrideAlpha = 0.85;
+                   } else {
+                      const blowOutAngle = p.h1 * Math.PI * 2;
+                      targetX = spiralX + Math.cos(blowOutAngle) * 800;
+                      targetY = spiralY + Math.sin(blowOutAngle) * 800;
+                      overrideAlpha = Math.max(0, 1 - (lockProgress * 1.5));
+                   }
+                }
+
+                if (blowupProgress > 0) {
+                    const explodeAngle = Math.atan2(targetY - lockCenterY, targetX - lockCenterX);
+                    const explodeDist = 2000 * blowupProgress;
+                    let explodedX = targetX + Math.cos(explodeAngle) * explodeDist;
+                    let explodedY = targetY + Math.sin(explodeAngle) * explodeDist;
+
+                    if (overrideAlpha !== null) overrideAlpha = lerp(overrideAlpha, 0.08, blowupProgress);
+                    targetX = lerp(explodedX, p.baseX, regridProgress);
+                    targetY = lerp(explodedY, p.baseY, regridProgress);
+                }
+              }
+            }
+
+            // Phase B: The White Wave Inversion
+            let distToCenter = 0;
+            if (waveProgress > 0 && waveProgress < 1) {
+               distToCenter = Math.hypot(p.baseX - width/2, p.baseY - height/2);
+               const distToWave = Math.abs(distToCenter - currentWaveRadius);
+               
+               // If particle is caught inside the wave impact front
+               if (distToWave < 200) {
+                   const intensity = 1 - (distToWave / 200);
+                   overrideAlpha = Math.max(0.1, intensity);
+                   // Flip char violently during wave
+                   if (Math.random() > 0.8) p.char = p.char === '1' ? '0' : '1';
+                   
+                   // Color interpolation to bright white during wave impact
+                   const wR = lerpColor(baseParticleRgb, 255, intensity);
+                   const wG = lerpColor(baseParticleRgb, 255, intensity);
+                   const wB = lerpColor(baseParticleRgb, 255, intensity);
+                   overrideFill = `rgb(${wR}, ${wG}, ${wB})`;
+                   
+                   // Lift particle slightly on Y axis based on wave power
+                   targetY -= intensity * 30;
+               }
+            }
+
+            // Phase C: Download Icon Particle Pattern
+            let forceFlip = false;
+            if (dlAnimProgress > 0) {
+                let pX = width/2; let pY = height/2;
+                const type = p.index % 3;
+
+                if (type === 0) { 
+                    pX = width/2 + (p.h1 - 0.5) * 10;
+                    pY = height/2 - 80 + (p.h2 * 100);
+                } else if (type === 1) { 
+                    const spread = p.h1 * 50;
+                    pX = width/2 + (p.h2 > 0.5 ? spread : -spread);
+                    pY = height/2 + 20 - spread;
+                } else { 
+                    if (p.h1 < 0.2) { 
+                        pX = width/2 - 60; pY = height/2 + 40 + (p.h2 * 30);
+                    } else if (p.h1 > 0.8) { 
+                        pX = width/2 + 60; pY = height/2 + 40 + (p.h2 * 30);
+                    } else { 
+                        pX = width/2 - 60 + ((p.h1 - 0.2)/0.6) * 120; pY = height/2 + 70;
+                    }
+                }
+                targetX = lerp(p.baseX, pX, dlAnimProgress);
+                targetY = lerp(p.baseY, pY, dlAnimProgress);
+                overrideFill = `rgba(255, 255, 255, ${dlAnimProgress * (1 - boxIn)})`;
+                overrideAlpha = Math.max(0, (dlAnimProgress * 0.8) * (1 - boxIn));
+            }
+
+            // Idle Ocean Breathing applies normally
+            if (!sequenceActive) {
+              const breathX = Math.cos(time + p.baseY * 0.02) * 3;
+              const breathY = Math.sin(time + p.baseX * 0.02) * 3;
+              targetX += breathX; targetY += breathY;
+            }
+
+            p.vx += (targetX - p.x) * currentSpring;
+            p.vy += (targetY - p.y) * currentSpring;
+            
+            // Mouse Interaction
+            if (mouse.x > -100 && C < 0.1 && lightMode === 0) { 
+              const dx = mouse.x - p.x; const dy = mouse.y - p.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance < REPULSION_RADIUS) {
+                const force = (REPULSION_RADIUS - distance) / REPULSION_RADIUS;
+                p.vx -= (dx / distance) * force * 2;
+                p.vy -= (dy / distance) * force * 2;
+                p.vx += mouseVx * force * 0.1;
+                p.vy += mouseVy * force * 0.1;
+              }
+            }
+
+            p.vx *= currentFriction; p.vy *= currentFriction;
+            p.x += p.vx; p.y += p.vy;
+            
+            const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+            
+            let glitch = 0;
+            if (S_norm < 0.5) glitch = S_norm / 0.5;
+            else if (S_norm >= 0.5 && S_norm < 1.0) glitch = 1 - ((S_norm - 0.5) / 0.5);
+            else if (C > 0 && C < 0.7) glitch = spiralProgress * 2;
+
+            const glitchX = (Math.random() - 0.5) * (glitch * 15);
+            const glitchY = (Math.random() - 0.5) * (glitch * 15);
+
+            if (overrideFill) {
+                ctx.fillStyle = overrideFill;
+            } else {
+                ctx.fillStyle = speed > 1.0 || glitch > 0.3 ? activeColor : idleColor;
+            }
+            
+            let finalAlpha = overrideAlpha !== null ? overrideAlpha : Math.min(0.06 + (speed * 0.12) + (glitch * 0.5), 1.0);
+            
+            // Reduce alpha when in light mode to prevent visual clutter
+            if (lightMode > 0 && overrideAlpha === null) {
+                finalAlpha = lerp(finalAlpha, 0.03, lightMode); 
+            }
+            
+            if (finalAlpha > 0) {
+              ctx.globalAlpha = finalAlpha;
+              let flipThreshold = 0.98 - (glitch * 0.6); 
+              if (speed > 2.0 || forceFlip) flipThreshold = 0.3; // Flipping extremely fast during wave/glitch
+              if (Math.random() > flipThreshold) p.char = p.char === '1' ? '0' : '1';
+
+              if (p.x > -20 && p.x < width + 20 && p.y > -20 && p.y < height + 20) {
+                ctx.fillText(p.char, p.x + glitchX, p.y + glitchY);
+              }
+            }
+            
+            ctx.globalAlpha = 1.0;
+          });
+
+          animationFrameId = requestAnimationFrame(render);
+        };
+
+        render();
+
+        return () => {
+          window.removeEventListener('mousemove', handleMouseMove);
+          window.removeEventListener('mouseleave', handleMouseLeave);
+          window.removeEventListener('resize', () => {});
+          cancelAnimationFrame(animationFrameId);
+        };
+      }, []);
+
+      const handleScroll = (e) => {
+        const scrollTop = e.target.scrollTop;
+        const vh = window.innerHeight;
+        
+        scrollState.current.target = scrollTop / vh; 
+        
+        const S = scrollState.current.target;
+        if (S < 0.5) setActiveTab('home');
+        else if (S < 3.5) setActiveTab('home'); 
+        else if (S < 8.5) setActiveTab('features'); 
+        else if (S < 11.5) setActiveTab('download');
+        else setActiveTab('updates');
+      };
+
+      const scrollToSection = (ref, tabName) => {
+        if (ref.current) { ref.current.scrollIntoView({ behavior: 'smooth' }); setActiveTab(tabName); }
+      };
+
+      return (
+        <div>
+          <canvas ref={canvasRef} className="binary-canvas" />
+
+          <div className="scroll-container" onScroll={handleScroll} ref={scrollRef}>
+            
+            {/* 0. Splash (100vh) */}
+            <section className="section splash-section">
+              <div className="splash-content">
+                <GridIcon />
+                <h1 className="splash-title">The Quotidian Vault</h1>
+                <div className="splash-subtitle">By The Mozzerella Company</div>
+              </div>
+              <div className="scroll-indicator">
+                <span>Scroll</span>
+                <ArrowDownIcon />
+              </div>
+            </section>
+
+            <div className="content-wrapper">
+              
+              <nav className="navbar" style={{ justifyContent: 'space-between', padding: '0 40px', flexWrap: 'nowrap' }}>
+                 <div style={{ display: 'flex', gap: '12px', flex: 1, minWidth: '0', alignItems: 'center' }}>
+                   <img src="icon.png" alt="Quotidian Vault Logo" style={{ height: '32px', width: '32px', borderRadius: '6px', filter: 'brightness(0) invert(var(--logo-invert, 1))', transition: 'filter 0.1s' }} />
+                   <span style={{ fontWeight: 700, letterSpacing: '0.02em', color: 'var(--text-main)', fontSize: '1.05rem', whiteSpace: 'nowrap' }}>Quotidian Vault</span>
+                 </div>
+                 <div style={{ display: 'flex', gap: '40px', justifyContent: 'center' }}>
+                   <button className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => scrollToSection(homeRef, 'home')}>Home</button>
+                   <button className={`nav-item ${activeTab === 'features' ? 'active' : ''}`} onClick={() => scrollToSection(featuresRef, 'features')}>Features</button>
+                   <button className={`nav-item ${activeTab === 'download' ? 'active' : ''}`} onClick={() => scrollToSection(downloadRef, 'download')}>Download</button>
+                   <button className={`nav-item ${activeTab === 'updates' ? 'active' : ''}`} onClick={() => scrollToSection(updatesRef, 'updates')}>Updates</button>
+                 </div>
+                 <div style={{ display: 'flex', gap: '20px', flex: 1, justifyContent: 'flex-end', whiteSpace: 'nowrap', minWidth: '0' }}>
+                   <button className="nav-item" onClick={() => setShowTutorial(true)}>Tutorial</button>
+                   <button className="nav-item" onClick={() => setShowTerms(true)}>Terms & Conditions</button>
+                 </div>
+               </nav>
+
+              {/* 1. Cinematic Track (300vh) */}
+              <section className="section cinematic-section" ref={homeRef} style={{ height: '300vh', display: 'block', padding: 0 }}>
+                <div className="sticky-timeline">
+                    <div className="page-content" ref={heroDOMRef} style={{ position: 'absolute', width: '100%', maxWidth: '1100px' }}>
+                      <div className="split-layout">
+                        <div className="text-column">
+                          <h2 className="huge-title">A Vault Reimagined.</h2>
+                          <p className="huge-subtitle">Absolute security meets fluid, modern design. Built for stealth, optimized for portability, and designed to leave zero traces.</p>
+                        </div>
+                        <div className="visual-container">
+                          <AbstractVaultVisual />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="security-impact-layout" ref={securityTextRef}>
+                      <h2 className="security-title">Military-Grade Isolation.</h2>
+                      <p className="security-desc">
+                        Forged with the robust .7z archiving engine, The Quotidian Vault leverages pure AES-256 encryption to completely seal your files. Your data is compressed into a cryptographic black hole—structurally impenetrable and mathematically impossible to breach without your precise credentials.
+                      </p>
+                    </div>
+                </div>
+                <div className="snap-page"></div>
+                <div className="snap-page"></div>
+              </section>
+
+              {/* 2. Scroll-Animated Features (300vh) Left Aligned */}
+              <section className="section features-section" ref={featuresRef} style={{ height: '300vh', display: 'block', padding: 0 }}>
+                <div className="sticky-timeline">
+                  {/* Positioned Left instead of Right */}
+                  <div style={{ position: 'absolute', left: '10%', width: '40%', maxWidth: '500px', display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
+                    
+                    {/* Feature 1 */}
+                    <div className="feature-presentation-box" ref={feature1Ref}>
+                      <ShieldIcon />
+                      <h2 className="security-title" style={{ fontSize: '2.5rem' }}>High-Security & Recovery</h2>
+                      <p className="security-desc">
+                        Generate cryptographically secure Recovery Codes exported directly to a safe PDF. Your ultimate backup for critical authentication.
+                      </p>
+                    </div>
+
+                    {/* Feature 2 */}
+                    <div className="feature-presentation-box" ref={feature2Ref} style={{ opacity: 0 }}>
+                      <GhostIcon />
+                      <h2 className="security-title" style={{ fontSize: '2.5rem' }}>Zero-Trace Portability</h2>
+                      <p className="security-desc">
+                        Run directly from a portable drive. The moment you lock the vault or eject the drive, the software instantly scrubs and deletes all temporary files, leaving no trace.
+                      </p>
+                    </div>
+
+                  </div>
+                  {/* Right Column for Image */}
+                  <div style={{ position: 'absolute', right: '10%', top: '50%', transform: 'translateY(-50%)', width: '40%', display: 'flex', justifyContent: 'center' }}>
+                     <img src="Screenshot%202026-07-23%20125334.png" alt="Create Your Vault" ref={featureImageRef} style={{ width: '100%', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', maxWidth: '400px' }} />
+                  </div>
+                </div>
+                <div className="snap-page"></div>
+                <div className="snap-page"></div>
+              </section>
+
+              {/* 3. Wave Transition to Custom Vault Explorer (200vh) */}
+              <section className="section explorer-section" style={{ height: '200vh', display: 'block', padding: 0 }}>
+                 <div className="sticky-timeline" style={{ pointerEvents: 'none' }}>
+                    <div ref={explorerTextRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: '800px', opacity: 0, padding: '0 40px' }}>
+                       <FolderIcon />
+                       <h2 className="security-title" style={{ fontSize: '3.5rem', marginBottom: '24px' }}>Custom Vault Explorer</h2>
+                       <p className="security-desc" style={{ fontSize: '1.25rem' }}>
+                          A beautiful, natively rendered view of your hidden files. Featuring drag-and-drop encryption, virtual folders, and Smart Views (Docs, Audio, Video). Managing encrypted files shouldn't feel like using a terminal.
+                       </p>
+                       <img src="Screenshot 2026-07-23 121432.png" alt="Custom Vault Explorer Interface" className="explorer-image" style={{ width: '100%', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', marginTop: '40px' }} />
+                    </div>
+                 </div>
+                 <div className="snap-page"></div>
+              </section>
+
+              {/* 4. Additional Operations (100vh) */}
+              <section className="section" ref={additionalRef}>
+                <div className="page-content">
+                  <h2 className="section-title">Additional Operations</h2>
+                  <div className="features-grid">
+                    <div className="feature-card">
+                      <AlertIcon />
+                      <h3 className="feature-title">The Danger Zone</h3>
+                      <p className="security-desc" style={{ fontSize: '0.95rem' }}>Permanent actions like full decryption or vault deletion are heavily guarded. Requires both your password and a unique Recovery Code to proceed.</p>
+                    </div>
+                    <div className="feature-card">
+                      <FolderIcon />
+                      <h3 className="feature-title">Smart Organization</h3>
+                      <p className="security-desc" style={{ fontSize: '0.95rem' }}>Bypass raw archive structures. Access virtual folders and instant file sorting, powered directly in memory.</p>
+                    </div>
+                    <div className="feature-card">
+                      <SearchIcon />
+                      <h3 className="feature-title">Auto-Scan Detection</h3>
+                      <p className="security-desc" style={{ fontSize: '0.95rem' }}>Never lose track of your hidden vaults. Built-in auto-scanners detect hidden .7z vaults on USB drives and present them seamlessly.</p>
+                    </div>
+                    <div className="feature-card">
+                      <svg className="svg-icon feature-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                      <h3 className="feature-title">Inactivity Safety Timeout</h3>
+                      <p className="security-desc" style={{ fontSize: '0.95rem' }}>Leave your desk without worry. Detects 5 minutes of inactivity to automatically trigger an emergency lock, purging files and securing the vault.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* 5. Download Animation Track (200vh) */}
+              <section className="section download-section" ref={downloadRef} style={{ height: '200vh', display: 'block', padding: 0 }}>
+                 <div className="sticky-timeline" style={{ flexDirection: 'column' }}>
+                    <h1 ref={downloadTextRef} style={{ position: 'absolute', top: '25%', fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.03em', textAlign: 'center' }}></h1>
+                    
+                    <div ref={downloadBoxRef} style={{ opacity: 0, position: 'absolute', top: '50%', transform: 'translateY(-50%)', width: '100%', display: 'flex', justifyContent: 'center', padding: '0 20px', zIndex: 100 }}>
+                      <div className="download-box" style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+                        <h2 className="section-title" style={{marginBottom: '8px', color: 'var(--text-main)'}}>Get The Vault</h2>
+                        <p style={{color: 'var(--text-dim)', marginBottom: '40px'}}>Version 1.0.0 Beta • Windows 10/11 (64-bit)</p>
+                        
+                        <button onClick={() => setShowDownloadModal(true)} className="btn-primary" style={{ display: 'inline-flex', textDecoration: 'none', fontFamily: 'inherit', border: '1px solid rgba(150,150,150,0.2)' }}>
+                          <DownloadIcon /> Download for Windows
+                        </button>
+                        
+                        <div style={{
+                          backgroundColor: 'rgba(255, 165, 0, 0.1)', borderLeft: '3px solid orange', 
+                          padding: '12px 16px', margin: '24px 0', borderRadius: '0 4px 4px 0', textAlign: 'left',
+                          color: 'var(--text-dim)', fontSize: '0.9rem', lineHeight: '1.5'
+                        }}>
+                          <strong style={{ color: 'orange' }}>Note:</strong> Because we are a new independent developer, Windows SmartScreen may completely block the installer and only show a "Learn more" button. If this happens, simply right-click the installer file, select <strong>Properties</strong>, check the <strong>Unblock</strong> box at the bottom, and click <strong>Apply</strong> to install.
+                        </div>
+
+                        <p className="disclaimer" style={{color: 'var(--text-sub)'}}>
+                          <strong>Legal Disclaimer:</strong> The Mozzerella Company is an unregistered brand marker. This software is provided "AS-IS" without warranties. By downloading, you agree to our local encryption End User License Agreement (EULA). We cannot recover lost passwords or data.
+                        </p>
+                      </div>
+                    </div>
+                 </div>
+                 <div className="snap-page"></div>
+              </section>
+
+              {/* 6. Updates (100vh) */}
+              <section className="section" ref={updatesRef} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div className="page-content" style={{ flexGrow: 1, paddingBottom: '40px' }}>
+                  <h2 className="section-title">Changelog</h2>
+                  <div className="timeline">
+                    <div className="timeline-item">
+                      <div className="timeline-dot"></div>
+                      <div className="timeline-date">LATEST • JULY 2026</div>
+                      <div className="timeline-content">
+                        <h3>Version 1.0.0 (Official Release)</h3>
+                        <p>Stable release candidate. Fixed a critical background hanging issue caused by the 7-Zip engine. Implemented a strict single-instance application lock to prevent ghost processes. Added the comprehensive interactive Official User Manual directly to the web interface. Adjusted SmartScreen warnings for local installations.</p>
+                      </div>
+                    </div>
+                    <div className="timeline-item">
+                      <div className="timeline-dot"></div>
+                      <div className="timeline-date">PREVIOUS • JUNE 2026</div>
+                      <div className="timeline-content">
+                        <h3>Beta v0.9.5</h3>
+                        <p>Introduced the Glassmorphism UI and dynamic light/dark modes. Added the 5-minute Inactivity Safety Timeout. Implemented the USB auto-scan detection module.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 0 40px', borderTop: '1px solid var(--glass-border)', background: 'var(--bg-alt)', marginTop: 'auto' }}>
+                  <img src="Screenshot 2026-04-02 181057.png" alt="Mozzerella Company Logo" style={{ height: '80px', opacity: 0.9, filter: 'grayscale(100%) brightness(1.5)', marginBottom: '24px' }} />
+                  <p style={{ color: 'var(--text-dim)', fontSize: '1rem', margin: '0 0 8px 0', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Made by the Mozzerella Company</p>
+                  <p style={{ color: 'var(--text-sub)', fontSize: '0.8rem', margin: 0 }}>Copyright &copy; 2026 The Mozzerella Company</p>
+                </div>
+              </section>
+
+            </div>
+          </div>
+
+          {/* Terms and Conditions Modal */}
+          {showTerms && (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+              backgroundColor: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(10px)',
+              zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px'
+            }} onClick={() => setShowTerms(false)}>
+              <div style={{
+                background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '16px',
+                width: '100%', maxWidth: '800px', maxHeight: '85vh', overflowY: 'auto',
+                padding: '40px', position: 'relative', boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                color: 'var(--text-main)', textAlign: 'left'
+              }} onClick={(e) => e.stopPropagation()}>
+                <button onClick={() => setShowTerms(false)} style={{
+                  position: 'absolute', top: '20px', right: '20px', background: 'var(--bg-alt)', border: '1px solid var(--glass-border)', borderRadius: '50%', width: '40px', height: '40px',
+                  color: 'var(--text-main)', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10
+                }}>&times;</button>
+                <h2 style={{marginTop: 0, marginBottom: '24px', fontSize: '2rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '16px'}}>Terms and Conditions</h2>
+                <div style={{ color: 'var(--text-dim)', fontSize: '0.95rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                  {`Terms and Conditions and End User License Agreement (EULA)
+For The Quotidian Vault Application & Website
+Version 1.0 Last Updated: July 23, 2026
+
+1. Acceptance of Terms & License Grant
+By accessing the official website for The Quotidian Vault (the "Website"), or by downloading, installing, accessing, or using The Quotidian Vault application (the "Software"), you agree to be bound by these Terms and Conditions ("Terms").
+The Software is provided free of charge. Subject to your compliance with these Terms, The Mozzerella Company grants you a limited, personal, non-exclusive, non-transferable, revocable license to install and use one or more copies of the Software for your personal or internal business use.
+Age Requirement: By using the Software or Website, you represent that you are at least 18 years old, or the age of majority in your jurisdiction, or that you have the explicit permission of a parent or legal guardian.
+If you do not agree to all of these Terms, do not use the Website and do not install or use the Software.
+
+2. Description of the Software
+The Quotidian Vault is a portable file encryption utility. It leverages the .7z archiving engine combined with AES-256 encryption to compress and seal user data into a local cryptographic environment.
+Local Execution: The encryption and decryption functions operate entirely on your local device.
+Data Privacy: Unless you explicitly enable optional online features, the Software does not transmit your vault contents, passwords, or encryption keys to any external server.
+
+3. Core Features & Mechanics
+By using the Software, you acknowledge the functionality of the following core mechanics:
+Custom Vault Explorer: A natively rendered graphical interface providing virtual folders, drag-and-drop encryption, and Smart Views directly in memory, bypassing raw archive structures.
+Data Minimization & Portability: The Software is designed to run directly from a portable USB drive. Upon locking the vault or ejecting the drive, the Software is designed to minimize residual unencrypted data on the host system by securely removing temporary files after normal operation.
+Auto-Scan Detection: The Software automatically detects hidden vaults on connected drives and mounts them securely.
+Inactivity Safety Timeout: After 5 minutes of detected system inactivity, the Software will automatically trigger an emergency lock—purging unencrypted files from memory and firmly securing the vault.
+The Danger Zone: Permanent, destructive actions (such as full decryption or vault deletion) are heavily restricted and require both the master password and your unique Recovery Code to proceed.
+
+4. Local Key Management & Absolute Data Loss
+The Quotidian Vault uses AES-256 local encryption. There are no backdoors, no cloud backups of your keys, and no "forgot password" mechanisms.
+Credentials & Recovery: Accessing your vault requires your master password and your cryptographically secure Recovery Code (which can be exported as a PDF for safekeeping).
+Irrecoverable Data: If you lose your master password and your exported Recovery Code PDF, your data is permanently lost. We do not possess master keys or recovery algorithms. The Mozzerella Company cannot recover lost passwords, decrypt data, or bypass the Danger Zone under any circumstances. You assume 100% of the responsibility for securely storing your passwords and Recovery Code PDFs.
+
+5. Technical Risks and Software Limitations
+While the Software utilizes robust AES-256 encryption, you acknowledge and accept the following inherent risks:
+A. Host Machine Security
+The Software encrypts data at rest. It cannot protect against compromised operating systems. The Software offers no protection against sophisticated forensic attacks, host-level malware, keyloggers, screen recording, spyware, or physical access by unauthorized individuals while your vault is unlocked.
+B. Hardware Interruption & Archive Corruption
+While the .7z architecture is highly stable, unexpected power loss, forceful ejection of a USB drive, or shutting down your computer during active encryption/decryption cycles could result in irreversible file corruption. You are solely responsible for safely ejecting hardware.
+C. Vault File Deletion
+Encryption prevents unauthorized parties from reading your files; it does not prevent them from deleting the vault container file itself from your hard drive or USB drive.
+D. Backup Responsibility
+You are solely responsible for maintaining adequate backups of your encrypted vaults and all data stored within them. Encryption is not a substitute for a comprehensive backup strategy.
+
+6. Website Terms of Use
+In addition to the Software, the following terms apply to your use of the Website:
+Informational Purposes: The Website is provided for informational and download purposes only.
+Availability: We do not guarantee that the Website will be available at all times, secure, or free from bugs or viruses. We reserve the right to suspend or withdraw the Website at any time without notice.
+Third-Party Links: The Website may contain links to third-party sites or resources. We have no control over the contents of those sites and accept no responsibility for them or for any loss or damage that may arise from your use of them.
+
+7. Privacy and Data Collection
+The Software operates entirely locally. We do not collect, transmit, store, or process your personal files, passwords, encryption keys, or vault contents.
+If the Website or future versions of the Software collect personal information (such as through standard web technologies, optional telemetry, or crash reporting features), such collection and use will be governed by a separate Privacy Policy.
+
+8. Prohibition on High-Risk & Mission-Critical Activities
+The Software is not fail-safe and is not licensed for use in high-risk environments. You expressly agree not to use the Software in connection with life-support systems, medical devices, nuclear infrastructure, emergency services, or any situation where software failure or data loss could lead to death, personal injury, or catastrophic damage.
+
+9. Prohibited Uses & Illegal Conduct
+You agree not to use the Software or Website for any unlawful purpose. You strictly agree not to use the Software to conceal, distribute, or store illicit materials, malware, ransomware, stolen intellectual property, or to facilitate illegal extortion or criminal enterprises.
+Your license to use the Software automatically terminates upon any material breach of these Terms. Upon termination, you must immediately cease using the Software and, where reasonably practicable, delete or destroy all copies in your possession, except where applicable law requires otherwise.
+
+10. License Restrictions
+Except to the extent prohibited by applicable law or required by an applicable open-source license, you may not reverse engineer, decompile, disassemble, modify, or create derivative works from the Software.
+
+11. Third-Party Libraries & Open-Source Components
+The Software is built using third-party libraries and open-source frameworks, including the 7-Zip engine. Third-party components are subject to their respective open-source licenses. You agree to comply with these obligations, and applicable license texts are provided with the Software distribution.
+
+12. Maintenance and Updates
+The Software and Website are provided as a completed, as-is product. We are under no obligation to provide ongoing updates, new features, security patches, or continued maintenance.
+
+13. Security Research & Vulnerability Disclosure
+We encourage ethical security research. If you discover a security vulnerability in The Quotidian Vault or the Website, please report it responsibly directly to the developer rather than exploiting it publicly. Good-faith security research conducted in a manner intended to avoid harm will not be considered a violation of these Terms.
+
+14. Disclaimer of Warranties ("AS-IS")
+BECAUSE THE SOFTWARE AND WEBSITE ARE PROVIDED FREE OF CHARGE, THEY ARE DELIVERED "AS-IS" AND "AS-AVAILABLE."
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE MOZZERELLA COMPANY DISCLAIMS ALL WARRANTIES, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SOFTWARE OR WEBSITE WILL OPERATE UNINTERRUPTED, BE ERROR-FREE, PREVENT ALL CYBERATTACKS, OR THAT STORED DATA WILL NEVER BECOME CORRUPTED OR LOST.
+
+15. Limitation of Liability
+IN NO EVENT SHALL THE MOZZERELLA COMPANY BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE, THE WEBSITE, OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+To the maximum extent permitted by applicable law, our total aggregate liability shall not exceed the amount you paid for the Software.
+
+16. Indemnification
+To the maximum extent permitted by applicable law, you agree to defend, indemnify, and hold harmless the developers and creators of The Quotidian Vault from and against any claims, liabilities, lawsuits, damages, losses, or expenses (including reasonable attorneys' fees) arising out of or in any way connected with your breach of these Terms, your misuse of the Software or Website, or any third-party claim resulting from data loss, corruption, or illegal activity conducted using your instance of the Software.
+
+17. Intellectual Property and Branding
+The Quotidian Vault is developed, published, and distributed under the brand name "The Mozzerella Company."
+You acknowledge and agree that "The Mozzerella Company" is an unregistered trade name and is utilized strictly for branding, marketing, and operational purposes. Notwithstanding its unregistered status, all right, title, and interest in and to the Software and Website—including all design, source code, the Software's user interface and visual design, underlying concepts, and intellectual property—remain the sole and exclusive property of the developer(s) operating under this name. These Terms grant you a license to use the Software; they do not transfer any ownership rights, intellectual property rights, or brand rights to you.
+Copyright © 2026 The Mozzerella Company. All rights reserved.
+
+18. Modifications to Terms
+Updated Terms become effective when published on our official Website or distributed with a new release of the Software. If you do not agree to the updated Terms, you must discontinue use of future versions and the Website.
+
+19. Miscellaneous
+Governing Law and Jurisdiction: These Terms shall be governed by the laws of India. The courts located in Surat, Gujarat, India shall have exclusive jurisdiction over any dispute arising out of or relating to these Terms.
+Force Majeure: We shall not be liable for any failure or delay caused by events beyond our reasonable control, including natural disasters, power outages, governmental actions, internet failures, or similar events.
+Severability: If any provision of these Terms is held to be invalid or unenforceable by a court of competent jurisdiction, the remaining provisions shall remain in full force and effect.
+Entire Agreement: These Terms constitute the entire agreement between you and The Mozzerella Company regarding the Software and Website, and supersede all prior or contemporaneous understandings, agreements, or representations.
+
+20. Contact Information
+For security vulnerability reports, legal notices, or general inquiries, please contact:
+Email: mozzerellaofficial@gmail.com`}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tutorial Modal */}
+          {showTutorial && (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(10px)',
+              zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center'
+            }} onClick={() => setShowTutorial(false)}>
+              <div style={{
+                width: '90%', maxWidth: '900px', height: '85vh',
+                backgroundColor: 'var(--glass-bg)', border: '1px solid var(--card-border)',
+                borderRadius: '16px', padding: '40px', overflowY: 'auto',
+                color: 'var(--text-main)', position: 'relative',
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                display: 'flex', flexDirection: 'column'
+              }} onClick={(e) => e.stopPropagation()}>
+                
+                <button onClick={() => setShowTutorial(false)} style={{
+                  position: 'absolute', top: '24px', right: '24px',
+                  background: 'transparent', border: 'none', color: 'var(--text-main)',
+                  fontSize: '24px', cursor: 'pointer', opacity: 0.7, padding: '8px'
+                }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                
+                <h1 style={{ fontSize: '2.5rem', marginBottom: '8px', fontWeight: 800 }}>The Quotidian Vault: Official User Manual</h1>
+                <p style={{ color: 'var(--text-dim)', marginBottom: '32px', fontSize: '1.1rem' }}>Welcome to The Quotidian Vault, your portable, military-grade digital locker. This guide will walk you through every feature of the app step-by-step, explaining what each button does and how to keep your files secure.</p>
+
+
+
+                <div style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--text-dim)' }}>
+                  
+                  <div style={{ backgroundColor: 'rgba(255,165,0,0.1)', borderLeft: '4px solid orange', padding: '16px', marginBottom: '32px', borderRadius: '0 8px 8px 0' }}>
+                    <strong style={{ color: 'orange', display: 'block', marginBottom: '8px' }}>NOTE: Legal Disclaimer</strong>
+                    The following instructions represent the recommended best practices for using The Quotidian Vault. Adhering to these guidelines helps ensure maximum data security and minimizes the risk of accidental data loss or archive corruption. However, as stated in our Terms & Conditions, the user assumes all responsibility for data integrity and credentials management.
+                  </div>
+
+                  <h3 style={{ color: 'var(--text-main)', fontSize: '1.5rem', marginTop: '32px', marginBottom: '16px' }}>1. Getting Started: The Startup Screen</h3>
+                  <p>When you first open the application, you are greeted by the Startup Screen. Here you have three main options:</p>
+                  <ul style={{ paddingLeft: '24px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <li><strong>[+] ENCRYPT NEW FILE (Create a New Vault):</strong> Use this to create a brand new encrypted vault. You will choose where to save the vault file (e.g., on your PC or a USB drive), create a Master Password, and set a unique Secret Code.</li>
+                    <li><strong>[_] OPEN EXISTING VAULT:</strong> If you already have a .7z vault file, click this to manually locate it on your computer and unlock it.</li>
+                    <li><strong>[O] AUTO-SCAN FOLDER FOR HIDDEN VAULT:</strong> If you forgot where you saved your vault on a specific drive, select the drive, and the app will scan it to find your hidden vault automatically.</li>
+                  </ul>
+
+                  <div style={{ backgroundColor: 'rgba(255,50,50,0.1)', borderLeft: '4px solid #ff4444', padding: '16px', marginBottom: '32px', borderRadius: '0 8px 8px 0' }}>
+                    <strong style={{ color: '#ff4444', display: 'block', marginBottom: '8px' }}>WARNING: Do Not Lose Your Credentials!</strong>
+                    The Quotidian Vault uses dual-factor AES-256 encryption. There are NO backdoors and NO "Forgot Password" buttons. If you lose your Master Password or your Secret Code, your data is permanently lost.
+                  </div>
+
+                  <h3 style={{ color: 'var(--text-main)', fontSize: '1.5rem', marginTop: '32px', marginBottom: '16px' }}>2. Navigating the Vault Explorer</h3>
+                  <p>Once you unlock your vault, you enter the Vault Explorer. This is your secure workspace.</p>
+                  
+                  <strong style={{ display: 'block', marginTop: '16px', marginBottom: '8px', color: 'var(--text-main)' }}>The Sidebar (Left Menu)</strong>
+                  <ul style={{ paddingLeft: '24px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <li><strong>Smart Views:</strong> Click on All Files, Images, Documents, Videos, or Audio to instantly filter your vault and see only specific types of files, regardless of what folder they are saved in.</li>
+                    <li><strong>Safe Mode Toggle:</strong> A switch located at the bottom of the sidebar. You can toggle between "Standard Mode" (Full Access) and "Safe Mode" (Read-Only). (See Section 4 for details).</li>
+                    <li><strong>Danger Zone Toggle (The Eye Icon):</strong> Clicking the eye icon at the bottom of the sidebar reveals advanced, destructive options. (See Section 6 for details).</li>
+                  </ul>
+
+                  <strong style={{ display: 'block', marginTop: '16px', marginBottom: '8px', color: 'var(--text-main)' }}>The Top Toolbar</strong>
+                  <ul style={{ paddingLeft: '24px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <li><strong>Search Bar:</strong> Type here to instantly find any file or folder by name.</li>
+                    <li><strong>View Toggle:</strong> Click the icon on the far right of the search bar to switch between a visual Grid View (great for images) and a detailed List View (great for documents).</li>
+                    <li><strong>Back Button & Path:</strong> Shows you exactly which folder you are currently inside. Click the back arrow to go up one folder.</li>
+                  </ul>
+
+                  <h3 style={{ color: 'var(--text-main)', fontSize: '1.5rem', marginTop: '32px', marginBottom: '16px' }}>3. Managing Your Files (Standard Mode)</h3>
+                  <p>When you are in Standard Mode, you have full control over your files.</p>
+                  <ul style={{ paddingLeft: '24px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <li><strong>Adding Files (Drag & Drop):</strong> You can simply drag files directly from your computer's desktop into the Vault Explorer window to encrypt them instantly.</li>
+                    <li><strong>Adding Files (The [+] Button):</strong> Click the large "+" icon in the main grid to browse your computer and select files to encrypt.</li>
+                    <li><strong>Creating Folders:</strong> Click the "Folder+" icon to create a new folder to organize your files.</li>
+                    <li><strong>Viewing & Editing Files:</strong> Double-click any file to open it. The app securely and temporarily extracts the file so you can view or edit it. Any changes you make and save will automatically sync back into the encrypted vault!</li>
+                    <li><strong>Extracting Files (Exporting):</strong> Right-click (or click the three dots on) a file/folder and select Extract. This allows you to save a decrypted copy of the file back to your regular computer.</li>
+                    <li><strong>Renaming & Deleting:</strong> Right-click any file or folder to rename it or permanently delete it from the vault.</li>
+                  </ul>
+
+                  <h3 style={{ color: 'var(--text-main)', fontSize: '1.5rem', marginTop: '32px', marginBottom: '16px' }}>4. Safe Mode (Read-Only)</h3>
+                  <p>Safe Mode is designed for when you need to open your vault on a public or untrusted computer (like a library or a shared office PC).</p>
+                  <ul style={{ paddingLeft: '24px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <li><strong>What it does:</strong> It completely locks down the vault. You cannot add, edit, rename, or delete files while in Safe Mode.</li>
+                    <li><strong>Secure Extraction:</strong> If you need to extract a file to the computer while in Safe Mode, the Extract button will initially be greyed out.</li>
+                    <li><strong>Unlocking Extraction:</strong> To extract a file, you must click the "Allow Extraction" button and re-enter your Master Password and Secret Code. This grants a 15-minute window where extraction is allowed. After 15 minutes, the app locks down again. This prevents someone from stealing your files if you walk away from the computer.</li>
+                  </ul>
+
+                  <h3 style={{ color: 'var(--text-main)', fontSize: '1.5rem', marginTop: '32px', marginBottom: '16px' }}>5. Automatic Safety Features</h3>
+                  <p>The Quotidian Vault works in the background to protect you from accidents and snoops:</p>
+                  <ul style={{ paddingLeft: '24px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <li><strong>5-Minute Inactivity Lock:</strong> If you step away from your computer and don't interact with the app for 5 minutes, the vault will automatically lock itself and purge all data from memory.</li>
+                    <li><strong>USB Eject Auto-Lock:</strong> If your vault is stored on a portable USB drive and the drive is unexpectedly unplugged, the app detects the hardware removal and instantly locks down to prevent data leakage.</li>
+                    <li><strong>Orphan Cleanup:</strong> If your computer crashes while you are editing a file, a temporary file might be left behind on your hard drive. The next time you open the app, it automatically hunts down and securely shreds these leftover files.</li>
+                  </ul>
+
+                  <h3 style={{ color: 'var(--text-main)', fontSize: '1.5rem', marginTop: '32px', marginBottom: '16px' }}>6. The Danger Zone (Advanced)</h3>
+                  <p>At the bottom of the sidebar, clicking the Eye Icon reveals the Danger Zone. These actions require your Master Password and Secret Code to execute, as they are destructive.</p>
+                  <ul style={{ paddingLeft: '24px', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <li><strong>Export Entire Vault:</strong> This decrypts every single file and folder inside your vault and saves them to a normal folder on your computer. Use this if you want to stop using the vault and get all your files back at once.</li>
+                    <li><strong>Eject & Self-Destruct Vault:</strong> This action permanently deletes the .7z vault file from your hard drive or USB stick. Use this only in extreme emergencies when you need to completely wipe your data from existence.</li>
+                  </ul>
+
+                  <h3 style={{ color: 'var(--text-main)', fontSize: '1.5rem', marginTop: '32px', marginBottom: '16px' }}>7. Best Practices & Tips</h3>
+                  <ul style={{ paddingLeft: '24px', marginBottom: '32px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <li><strong>Always eject safely:</strong> Never pull out your USB drive while a file is actively saving or importing. Always close the app or Lock the vault first to prevent file corruption.</li>
+                    <li><strong>Use Smart Views:</strong> If you have thousands of files, use the "Images" or "Documents" buttons on the left to instantly find what you need without digging through folders.</li>
+                    <li><strong>Keep your Recovery Code safe:</strong> When you first create a vault, the app prompts you to export a PDF containing your Secret Recovery Code. Print this PDF and hide it somewhere safe.</li>
+                  </ul>
+
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Download & Troubleshooting Modal */}
+          {showDownloadModal && (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(10px)',
+              zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center'
+            }} onClick={() => setShowDownloadModal(false)}>
+              <div style={{
+                width: '90%', maxWidth: '600px',
+                backgroundColor: 'var(--glass-bg)', border: '1px solid var(--card-border)',
+                borderRadius: '16px', padding: '40px',
+                color: 'var(--text-main)', position: 'relative',
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                display: 'flex', flexDirection: 'column', textAlign: 'center'
+              }} onClick={(e) => e.stopPropagation()}>
+                
+                <button onClick={() => setShowDownloadModal(false)} style={{
+                  position: 'absolute', top: '24px', right: '24px',
+                  background: 'transparent', border: 'none', color: 'var(--text-main)',
+                  fontSize: '24px', cursor: 'pointer', opacity: 0.7, padding: '8px'
+                }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                
+                <h2 style={{ fontSize: '2rem', marginBottom: '16px', fontWeight: 800 }}>Ready to Download</h2>
+                <p style={{ color: 'var(--text-dim)', marginBottom: '32px', fontSize: '1.1rem', lineHeight: '1.6' }}>
+                  Your secure vault environment awaits.
+                </p>
+                
+                <a href="downloads/The Quotidian Vault Setup 1.0.0.exe" download onClick={() => setShowDownloadModal(false)} className="btn-primary" style={{ display: 'inline-flex', textDecoration: 'none', justifyContent: 'center', marginBottom: '32px', fontFamily: 'inherit' }}>
+                  <DownloadIcon /> Download for Windows
+                </a>
+
+                <div style={{ backgroundColor: 'rgba(255,50,50,0.1)', borderLeft: '4px solid #ff4444', padding: '24px', borderRadius: '0 8px 8px 0', textAlign: 'left' }}>
+                  <strong style={{ color: '#ff4444', display: 'block', marginBottom: '12px', fontSize: '1.1rem' }}>Uninstall or Troubleshooting Tool</strong>
+                  <p style={{ color: 'var(--text-dim)', fontSize: '0.95rem', margin: '0 0 20px 0', lineHeight: '1.6' }}>
+                    If you are facing issues uninstalling a previous version, if the app is frozen, or if you simply want to completely uninstall and remove the app from your system, download our Emergency Uninstaller. This script will forcefully close background processes, cleanly remove all installation files, and delete itself when finished.
+                  </p>
+                  <a href="emergency-uninstaller.bat" download style={{ 
+                    display: 'inline-block', textDecoration: 'none', border: '1px solid #ff4444', 
+                    color: '#ff4444', padding: '12px 20px', borderRadius: '4px', fontSize: '0.9rem',
+                    fontWeight: 600, transition: 'background 0.2s'
+                  }} onMouseOver={(e) => e.target.style.background = 'rgba(255,68,68,0.1)'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
+                    Download Emergency Uninstaller
+                  </a>
+                </div>
+
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<OfficialSite />);
+
+</script>
+</body>
+</html>
