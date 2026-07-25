@@ -1,0 +1,134 @@
+Copyright (c) 2026 The Mozzerella Company. All Rights Reserved.
+
+This source code, "The Quotidian Vault," and its associated assets are the exclusive property of Mozzerella. You may not copy, distribute, modify, or use this code for any purpose without explicit written permission.
+
+------------------------------------------------------------------------
+
+TERMS AND CONDITIONS
+
+1. Acceptance of Terms
+By downloading, installing, or using The Quotidian Vault, you agree to be bound by these Terms and Conditions.
+
+2. License to Use
+Mozzerella grants you a personal, non-exclusive, non-transferable, and limited license to use The Quotidian Vault for personal, non-commercial purposes. 
+
+3. Restrictions
+You may not:
+- Decompile, reverse engineer, or disassemble the application.
+- Distribute, rent, lease, or sub-license the application to third parties.
+- Remove or alter any proprietary notices or labels on the application.
+
+4. Disclaimer of Warranty
+The application is provided "AS IS", without warranty of any kind. Mozzerella disclaims all warranties, either express or implied, including but not limited to implied warranties of merchantability and fitness for a particular purpose.
+
+5. Limitation of Liability
+In no event shall Mozzerella be liable for any special, incidental, indirect, or consequential damages whatsoever arising out of the use of or inability to use the application.
+
+6. Governing Law
+These Terms and Conditions shall be governed by and construed in accordance with the laws and courts of Surat, India.
+
+7. Contact Information
+For any questions regarding these Terms or to request permission for code usage, please contact:
+mozzerellaoficial@gmail.com
+
+
+
+
+Terms and conditions for the application and active website do apply:
+
+Terms and Conditions and End User License Agreement (EULA)
+For The Quotidian Vault Application & Website
+Version 1.0 Last Updated: July 23, 2026
+
+1. Acceptance of Terms & License Grant
+By accessing the official website for The Quotidian Vault (the "Website"), or by downloading, installing, accessing, or using The Quotidian Vault application (the "Software"), you agree to be bound by these Terms and Conditions ("Terms").
+The Software is provided free of charge. Subject to your compliance with these Terms, The Mozzerella Company grants you a limited, personal, non-exclusive, non-transferable, revocable license to install and use one or more copies of the Software for your personal or internal business use.
+Age Requirement: By using the Software or Website, you represent that you are at least 18 years old, or the age of majority in your jurisdiction, or that you have the explicit permission of a parent or legal guardian.
+If you do not agree to all of these Terms, do not use the Website and do not install or use the Software.
+
+2. Description of the Software
+The Quotidian Vault is a portable file encryption utility. It leverages the .7z archiving engine combined with AES-256 encryption to compress and seal user data into a local cryptographic environment.
+Local Execution: The encryption and decryption functions operate entirely on your local device.
+Data Privacy: Unless you explicitly enable optional online features, the Software does not transmit your vault contents, passwords, or encryption keys to any external server.
+
+3. Core Features & Mechanics
+By using the Software, you acknowledge the functionality of the following core mechanics:
+Custom Vault Explorer: A natively rendered graphical interface providing virtual folders, drag-and-drop encryption, and Smart Views directly in memory, bypassing raw archive structures.
+Data Minimization & Portability: The Software is designed to run directly from a portable USB drive. Upon locking the vault or ejecting the drive, the Software is designed to minimize residual unencrypted data on the host system by securely removing temporary files after normal operation.
+Auto-Scan Detection: The Software automatically detects hidden vaults on connected drives and mounts them securely.
+Inactivity Safety Timeout: After 5 minutes of detected system inactivity, the Software will automatically trigger an emergency lock—purging unencrypted files from memory and firmly securing the vault.
+The Danger Zone: Permanent, destructive actions (such as full decryption or vault deletion) are heavily restricted and require both the master password and your unique Recovery Code to proceed.
+
+4. Local Key Management & Absolute Data Loss
+The Quotidian Vault uses AES-256 local encryption. There are no backdoors, no cloud backups of your keys, and no "forgot password" mechanisms.
+Credentials & Recovery: Accessing your vault requires your master password and your cryptographically secure Recovery Code (which can be exported as a PDF for safekeeping).
+Irrecoverable Data: If you lose your master password and your exported Recovery Code PDF, your data is permanently lost. We do not possess master keys or recovery algorithms. The Mozzerella Company cannot recover lost passwords, decrypt data, or bypass the Danger Zone under any circumstances. You assume 100% of the responsibility for securely storing your passwords and Recovery Code PDFs.
+
+5. Technical Risks and Software Limitations
+While the Software utilizes robust AES-256 encryption, you acknowledge and accept the following inherent risks:
+A. Host Machine Security
+The Software encrypts data at rest. It cannot protect against compromised operating systems. The Software offers no protection against sophisticated forensic attacks, host-level malware, keyloggers, screen recording, spyware, or physical access by unauthorized individuals while your vault is unlocked.
+B. Hardware Interruption & Archive Corruption
+While the .7z architecture is highly stable, unexpected power loss, forceful ejection of a USB drive, or shutting down your computer during active encryption/decryption cycles could result in irreversible file corruption. You are solely responsible for safely ejecting hardware.
+C. Vault File Deletion
+Encryption prevents unauthorized parties from reading your files; it does not prevent them from deleting the vault container file itself from your hard drive or USB drive.
+D. Backup Responsibility
+You are solely responsible for maintaining adequate backups of your encrypted vaults and all data stored within them. Encryption is not a substitute for a comprehensive backup strategy.
+
+6. Website Terms of Use
+In addition to the Software, the following terms apply to your use of the Website:
+Informational Purposes: The Website is provided for informational and download purposes only.
+Availability: We do not guarantee that the Website will be available at all times, secure, or free from bugs or viruses. We reserve the right to suspend or withdraw the Website at any time without notice.
+Third-Party Links: The Website may contain links to third-party sites or resources. We have no control over the contents of those sites and accept no responsibility for them or for any loss or damage that may arise from your use of them.
+
+7. Privacy and Data Collection
+The Software operates entirely locally. We do not collect, transmit, store, or process your personal files, passwords, encryption keys, or vault contents.
+If the Website or future versions of the Software collect personal information (such as through standard web technologies, optional telemetry, or crash reporting features), such collection and use will be governed by a separate Privacy Policy.
+
+8. Prohibition on High-Risk & Mission-Critical Activities
+The Software is not fail-safe and is not licensed for use in high-risk environments. You expressly agree not to use the Software in connection with life-support systems, medical devices, nuclear infrastructure, emergency services, or any situation where software failure or data loss could lead to death, personal injury, or catastrophic damage.
+
+9. Prohibited Uses & Illegal Conduct
+You agree not to use the Software or Website for any unlawful purpose. You strictly agree not to use the Software to conceal, distribute, or store illicit materials, malware, ransomware, stolen intellectual property, or to facilitate illegal extortion or criminal enterprises.
+Your license to use the Software automatically terminates upon any material breach of these Terms. Upon termination, you must immediately cease using the Software and, where reasonably practicable, delete or destroy all copies in your possession, except where applicable law requires otherwise.
+
+10. License Restrictions
+Except to the extent prohibited by applicable law or required by an applicable open-source license, you may not reverse engineer, decompile, disassemble, modify, or create derivative works from the Software.
+
+11. Third-Party Libraries & Open-Source Components
+The Software is built using third-party libraries and open-source frameworks, including the 7-Zip engine. Third-party components are subject to their respective open-source licenses. You agree to comply with these obligations, and applicable license texts are provided with the Software distribution.
+
+12. Maintenance and Updates
+The Software and Website are provided as a completed, as-is product. We are under no obligation to provide ongoing updates, new features, security patches, or continued maintenance.
+
+13. Security Research & Vulnerability Disclosure
+We encourage ethical security research. If you discover a security vulnerability in The Quotidian Vault or the Website, please report it responsibly directly to the developer rather than exploiting it publicly. Good-faith security research conducted in a manner intended to avoid harm will not be considered a violation of these Terms.
+
+14. Disclaimer of Warranties ("AS-IS")
+BECAUSE THE SOFTWARE AND WEBSITE ARE PROVIDED FREE OF CHARGE, THEY ARE DELIVERED "AS-IS" AND "AS-AVAILABLE."
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE MOZZERELLA COMPANY DISCLAIMS ALL WARRANTIES, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SOFTWARE OR WEBSITE WILL OPERATE UNINTERRUPTED, BE ERROR-FREE, PREVENT ALL CYBERATTACKS, OR THAT STORED DATA WILL NEVER BECOME CORRUPTED OR LOST.
+
+15. Limitation of Liability
+IN NO EVENT SHALL THE MOZZERELLA COMPANY BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE, THE WEBSITE, OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+To the maximum extent permitted by applicable law, our total aggregate liability shall not exceed the amount you paid for the Software.
+
+16. Indemnification
+To the maximum extent permitted by applicable law, you agree to defend, indemnify, and hold harmless the developers and creators of The Quotidian Vault from and against any claims, liabilities, lawsuits, damages, losses, or expenses (including reasonable attorneys' fees) arising out of or in any way connected with your breach of these Terms, your misuse of the Software or Website, or any third-party claim resulting from data loss, corruption, or illegal activity conducted using your instance of the Software.
+
+17. Intellectual Property and Branding
+The Quotidian Vault is developed, published, and distributed under the brand name "The Mozzerella Company."
+You acknowledge and agree that "The Mozzerella Company" is an unregistered trade name and is utilized strictly for branding, marketing, and operational purposes. Notwithstanding its unregistered status, all right, title, and interest in and to the Software and Website—including all design, source code, the Software's user interface and visual design, underlying concepts, and intellectual property—remain the sole and exclusive property of the developer(s) operating under this name. These Terms grant you a license to use the Software; they do not transfer any ownership rights, intellectual property rights, or brand rights to you.
+Copyright © 2026 The Mozzerella Company. All rights reserved.
+
+18. Modifications to Terms
+Updated Terms become effective when published on our official Website or distributed with a new release of the Software. If you do not agree to the updated Terms, you must discontinue use of future versions and the Website.
+
+19. Miscellaneous
+Governing Law and Jurisdiction: These Terms shall be governed by the laws of India. The courts located in Surat, Gujarat, India shall have exclusive jurisdiction over any dispute arising out of or relating to these Terms.
+Force Majeure: We shall not be liable for any failure or delay caused by events beyond our reasonable control, including natural disasters, power outages, governmental actions, internet failures, or similar events.
+Severability: If any provision of these Terms is held to be invalid or unenforceable by a court of competent jurisdiction, the remaining provisions shall remain in full force and effect.
+Entire Agreement: These Terms constitute the entire agreement between you and The Mozzerella Company regarding the Software and Website, and supersede all prior or contemporaneous understandings, agreements, or representations.
+
+20. Contact Information
+For security vulnerability reports, legal notices, or general inquiries, please contact:
+Email: mozzerellaofficial@gmail.com
